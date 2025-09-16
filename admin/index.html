@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الورش</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body { background-color: #f8f9fa; text-align: right; }
+        .container { max-width: 1200px; }
+        .header { display: flex; justify-content: space-between; align-items-center; margin: 20px 0; }
+        .table-container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .action-buttons button { border: none; background: none; padding: 5px 10px; }
+        .btn-edit { color: #ffc107; } .btn-view { color: #17a2b8; } .btn-delete { color: #dc3545; }
+        .sortable-header { cursor: pointer; }
+        .sortable-header .fa { margin-right: 5px; }
+        .table th { text-align: center; vertical-align: middle; }
+        .modal-header .close { margin: -1rem -1rem -1rem auto; }
+        .pagination-container { margin-top: 20px; }
+        .scrollable-table { max-height: 450px; overflow-y: auto; }
+        .filter-bar { background-color: #f8f9fa; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; }
+        .global-filters { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        /* --- START OF NEW STYLE --- */
+        .collapsible-header a { color: inherit; text-decoration: none; }
+        .collapsible-header .fa-chevron-down { transition: transform 0.2s ease-in-out; }
+        .collapsible-header a[aria-expanded="true"] .fa-chevron-down { transform: rotate(180deg); }
+        /* --- END OF NEW STYLE --- */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h3>إدارة الورش</h3>
+            <button class="btn btn-primary" onclick="openWorkshopModal()"><i class="fa fa-plus"></i> إنشاء ورشة جديدة</button>
+        </div>
+
+        <!-- Navigation -->
+        <ul class="nav nav-pills mb-3">
+             <li class="nav-item"><a class="nav-link active" href="index.html">إدارة الورش</a></li>
+             <li class="nav-item"><a class="nav-link" href="admin_users.html">إدارة المستخدمين</a></li>
+        </ul>
+
+        <!-- Global Search and Filter Bar -->
+        <div class="global-filters">
+            <div class="row">
+                <div class="col-md-12">
+                    <input type="text" id="searchInput" class="form-control" placeholder="ابحث عن ورشة عمل...">
+                </div>
+            </div>
+            <div class="row filter-bar mt-3">
+                <div class="col-md-4">
+                    <label for="filterCategoryMain">التصنيف الرئيسي</label>
+                    <select id="filterCategoryMain" class="form-control"></select>
+                </div>
+                <div class="col-md-4">
+                    <label for="filterCategorySub">التصنيف الفرعي</label>
+                    <select id="filterCategorySub" class="form-control" disabled></select>
+                </div>
+                <div class="col-md-4">
+                    <label for="filterCategorySpec">التخصص</label>
+                    <select id="filterCategorySpec" class="form-control" disabled></select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Workshops Table -->
+        <div id="active-workshops-container" class="table-container mb-4">
+            <!-- START OF CHANGE: Made header collapsible -->
+            <div class="collapsible-header">
+                <a data-toggle="collapse" href="#activeWorkshopsCollapse" aria-expanded="true">
+                    <h4 class="mb-3 d-flex justify-content-between align-items-center">
+                        الورش الحالية والقادمة
+                        <i class="fa fa-chevron-down"></i>
+                    </h4>
+                </a>
+            </div>
+            <div id="activeWorkshopsCollapse" class="collapse show">
+                <div class="scrollable-table">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="sortable-header" data-sort-by="title">عنوان الورشة <i class="fa fa-sort"></i></th>
+                                    <th class="sortable-header" data-sort-by="category_main">التصنيف <i class="fa fa-sort"></i></th>
+                                    <th class="sortable-header" data-sort-by="start_datetime">تاريخ البدء <i class="fa fa-sort"></i></th>
+                                    <th class="sortable-header" data-sort-by="approved_count">المسجلون <i class="fa fa-sort"></i></th>
+                                    <th class="sortable-header" data-sort-by="STATUS">الحالة <i class="fa fa-sort"></i></th>
+                                    <th>إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="active-workshop-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- END OF CHANGE -->
+        </div>
+
+        <!-- Past Workshops Table -->
+        <div id="past-workshops-container" class="table-container">
+             <!-- START OF CHANGE: Made header collapsible -->
+            <div class="collapsible-header">
+                <a data-toggle="collapse" href="#pastWorkshopsCollapse" aria-expanded="false">
+                    <h4 class="mb-3 d-flex justify-content-between align-items-center">
+                         الورش السابقة (المكتملة والملغاة)
+                         <i class="fa fa-chevron-down"></i>
+                    </h4>
+                </a>
+            </div>
+            <div id="pastWorkshopsCollapse" class="collapse">
+                 <div class="scrollable-table">
+                    <div class="table-responsive">
+                         <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="sortable-header" data-sort-by="title">عنوان الورشة <i class="fa fa-sort"></i></th>
+                                    <th class="sortable-header" data-sort-by="category_main">التصنيف <i class="fa fa-sort"></i></th>
+                                    <th class="sortable-header" data-sort-by="start_datetime">تاريخ البدء <i class="fa fa-sort"></i></th>
+                                    <th class="sortable-header" data-sort-by="approved_count">المسجلون <i class="fa fa-sort"></i></th>
+                                    <th class="sortable-header" data-sort-by="STATUS">الحالة <i class="fa fa-sort"></i></th>
+                                    <th>إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="past-workshop-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+             <!-- END OF CHANGE -->
+        </div>
+    </div>
+
+    <!-- Add/Edit Workshop Modal -->
+    <div class="modal fade" id="workshopModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="workshopModalTitle"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <form id="workshopForm">
+                        <input type="hidden" id="workshopId" name="workshop_id">
+                        <div class="form-group"><label for="title">عنوان الورشة</label><input type="text" class="form-control" id="title" name="title" required></div>
+                        <div class="form-group"><label for="description">الوصف</label><textarea class="form-control" id="description" name="description" rows="3"></textarea></div>
+                        <div class="row">
+                            <div class="col-md-4"><div class="form-group"><label for="category_main">التصنيف الرئيسي</label><select class="form-control" id="category_main" name="category_main"></select></div></div>
+                            <div class="col-md-4"><div class="form-group"><label for="category_sub">التصنيف الفرعي</label><select class="form-control" id="category_sub" name="category_sub"></select></div></div>
+                            <div class="col-md-4"><div class="form-group"><label for="category_specialization">التخصص</label><select class="form-control" id="category_specialization" name="category_specialization"></select></div></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6"><div class="form-group"><label for="instructorName">اسم المحاضر</label><input type="text" class="form-control" id="instructorName" name="instructor_name"></div></div>
+                            <div class="col-md-6"><div class="form-group"><label for="startDate">تاريخ البدء</label><input type="datetime-local" class="form-control" id="startDate" name="start_datetime" required></div></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6"><div class="form-group"><label for="location">الموقع</label><input type="text" class="form-control" id="location" name="location"></div></div>
+                            <div class="col-md-6"><div class="form-group"><label for="maxCapacity">السعة القصوى</label><input type="number" class="form-control" id="maxCapacity" name="max_capacity" required></div></div>
+                        </div>
+                        <div class="form-group"><label for="status">الحالة</label><select class="form-control" id="status" name="status" required><option value="Scheduled">مجدولة</option><option value="Completed">مكتملة</option><option value="Cancelled">ملغاة</option></select></div>
+                        <button type="submit" class="btn btn-primary">حفظ</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registrations Modal -->
+    <div class="modal fade" id="registrationsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title" id="registrationsModalTitle"></h5><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button></div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="sortable-header" data-sort-by="full_name">المسجل <i class="fa fa-sort"></i></th>
+                                    <th class="sortable-header" data-sort-by="email">البريد الإلكتروني <i class="fa fa-sort"></i></th>
+                                    <th class="sortable-header" data-sort-by="registration_date">تاريخ التسجيل <i class="fa fa-sort"></i></th>
+                                    <th class="sortable-header" data-sort-by="status">الحالة <i class="fa fa-sort"></i></th>
+                                    <th>إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="registrationsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-info" id="printAttendeesBtn"><i class="fa fa-print"></i> طباعة قائمة الحضور</button><button type="button" class="btn btn-secondary" data-dismiss="modal">إغلاق</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="admin_scripts.js"></script>
+</body>
+</html>
+

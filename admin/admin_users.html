@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المستخدمين</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body { background-color: #f8f9fa; text-align: right; }
+        .container { max-width: 1200px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; }
+        .nav-pills .nav-link { color: #007bff; font-weight: 500; }
+        .nav-pills .nav-link.active { background-color: #007bff; color: white; }
+        .search-container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .user-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 20px; }
+        .table-sm th, .table-sm td { padding: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h3>لوحة تحكم المسؤول</h3>
+        </div>
+
+        <!-- Navigation -->
+        <ul class="nav nav-pills mb-3">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">إدارة الورش</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="admin_users.html">إدارة المستخدمين</a>
+            </li>
+        </ul>
+
+        <!-- Search Section -->
+        <div class="search-container">
+            <h4 class="mb-3">البحث عن مستخدم</h4>
+            <div class="form-group">
+                <input type="text" id="userSearchInput" class="form-control" placeholder="ابحث بالاسم أو البريد الإلكتروني...">
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-container">
+            <!-- User details will be rendered here by JavaScript -->
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="admin_users.js"></script>
+</body>
+</html>

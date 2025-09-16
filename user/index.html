@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التسجيل بالورش - الإدارة العامة للخبراء</title>
+    <!-- Bootstrap 4.5.3 CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: right; }
+        .header-container { background-color: #ffffff; padding: 1.5rem 0; border-bottom: 1px solid #dee2e6; margin-bottom: 2rem; }
+        .header-container .logo { max-height: 80px; }
+        .header-container h1 { color: #333; font-weight: bold; margin: 0; }
+        .section-title { font-weight: 600; color: #495057; border-bottom: 2px solid #0056b3; padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+        .workshop-card { background: #fff; border: 1px solid #e1e1e1; border-radius: 8px; margin-bottom: 1.5rem; display: flex; flex-direction: column; height: 100%; transition: box-shadow 0.3s ease; }
+        .workshop-card:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .workshop-card .card-body { display: flex; flex-direction: column; flex-grow: 1; padding: 1.25rem; }
+        .workshop-card .card-title { font-weight: bold; color: #0056b3; margin-bottom: 0.5rem; }
+        .card-header-flex { display: flex; justify-content: space-between; align-items: center; }
+        .workshop-card .card-description { font-size: 0.95rem; color: #555; flex-grow: 1; margin-bottom: 1rem; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+        .workshop-card .card-info { font-size: 0.9rem; color: #666; margin-bottom: 0.25rem; }
+        .workshop-card .card-info .fa { margin-left: 8px; }
+        .workshop-card .btn { margin-top: auto; border-radius: 5px; font-weight: bold; }
+        .badge-approved, .badge-pending { font-size: 0.9rem; padding: 0.4em 0.7em; border-radius: 5px; }
+        .badge-approved { background-color: #28a745; color: white; }
+        .badge-pending { background-color: #ffc107; color: #212529; }
+        .modal-header .close { margin: -1.5rem -1.5rem -1.5rem auto; }
+        .nav-tabs .nav-link { font-weight: 600; color: #495057; }
+        .nav-tabs .nav-link.active { color: #0056b3; border-color: #dee2e6 #dee2e6 #fff; border-bottom: 3px solid #0056b3; }
+        .filter-bar { background-color: #e9ecef; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; }
+        
+        /* --- START OF NEW STYLE --- */
+        .scrollable-card-grid {
+            max-height: 750px; /* You can adjust this value */
+            overflow-y: auto;
+            background-color: #fff;
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: .25rem;
+        }
+        /* --- END OF NEW STYLE --- */
+    </style>
+</head>
+<body>
+/*
+    <div class="header-container">
+        <div class="container d-flex justify-content-between align-items-center">
+             <div class="text-right">
+                <h1>الإدارة العامة للخبراء</h1>
+                <p class="lead mb-0">بوابة التسجيل بالورش</p>
+            </div>
+            <img src="https://i.ibb.co/bJCv1rB/logo.png" alt="Logo" class="logo">
+        </div>
+    </div>
+*/
+    <div class="container">
+        <!-- Section 1: My Upcoming Workshops -->
+        <h4 class="section-title">ورشي القادمة</h4>
+        <div class="scrollable-card-grid">
+            <div id="my-upcoming-workshops" class="row"></div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Section 2: Available Workshops with Category Tabs -->
+        <h4 class="section-title">الورش المتاحة للتسجيل</h4>
+        <ul class="nav nav-tabs mb-3" id="categoryTabs" role="tablist">
+            <li class="nav-item"><a class="nav-link active" id="all-tab" data-toggle="tab" href="#all" role="tab">الكل</a></li>
+            <li class="nav-item"><a class="nav-link" id="judicial-tab" data-toggle="tab" href="#judicial" role="tab">دورات معهد الكويت للدراسات القضائية</a></li>
+            <li class="nav-item"><a class="nav-link" id="on-the-job-tab" data-toggle="tab" href="#on-the-job" role="tab">التدريب اثناء العمل</a></li>
+            <li class="nav-item"><a class="nav-link" id="external-tab" data-toggle="tab" href="#external" role="tab">البرامج التدريبية خارج الشئون الفنية</a></li>
+        </ul>
+
+        <!-- Filter Bar -->
+        <div id="filter-bar-container" class="filter-bar" style="display: none;">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group mb-md-0">
+                        <label for="subCategoryFilter" class="font-weight-bold">التصنيف الفرعي:</label>
+                        <select id="subCategoryFilter" class="form-control"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-0">
+                        <label for="specializationFilter" class="font-weight-bold">التخصص:</label>
+                        <select id="specializationFilter" class="form-control"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="tab-content" id="categoryTabsContent">
+            <div class="tab-pane fade show active" id="available-workshops-container" role="tabpanel">
+                <div class="scrollable-card-grid">
+                    <div id="available-workshops" class="row"></div>
+                </div>
+            </div>
+        </div>
+        
+        <hr class="my-4">
+
+        <!-- Section 3: My Past Workshops -->
+        <h4 class="section-title">الورش السابقة التي حضرتها</h4>
+        <div class="scrollable-card-grid">
+            <div id="my-past-workshops" class="row"></div>
+        </div>
+    </div>
+    
+    <!-- Workshop Details Modal -->
+    <div class="modal fade" id="workshopDetailsModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header text-right">
+            <h5 class="modal-title w-100" id="modalTitle">تفاصيل الورشة</h5>
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body text-right">
+            <h3 id="modalInstructor"></h3>
+            <p id="modalDescription"></p><hr><p id="modalDate"></p><p id="modalLocation"></p>
+          </div>
+          <div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">إغلاق</button></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        const categories = {
+            "دورات معهد الكويت للدراسات القضائية": { "الدورات الحسابية": ["لا يوجد"], "الدورات الهندسية": ["مدنية/معمارية", "ميكانيك", "كهرباء", "كمبيوتر"], "الدورات المشتركة": ["لا يوجد"], "دورات الخبراء الاشرافيين": ["رئيس قسم/مراقب/نائب رئيس"] },
+            "التدريب اثناء العمل": { "التدريب الميداني": ["حسابي", "هندسي", "مشترك"], "التدريب داخل الادارة": ["لا يوجد"] },
+            "البرامج التدريبية خارج الشئون الفنية": { "داخل الكويت": ["جميع الموظفين", "تخصصية", "رؤساء الاقسام", "المراقبين والمدراء", "ذات التقسيم اعلاه"], "خارج الكويت": ["لا يوجد"] }
+        };
+
+        let allAvailableWorkshops = [];
+        let activeMainCategory = 'All';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllWorkshops();
+            $('a[data-toggle="tab"]').on('shown.bs.tab', handleTabClick);
+            document.getElementById('subCategoryFilter').addEventListener('change', handleSubCategoryChange);
+            document.getElementById('specializationFilter').addEventListener('change', applyFiltersAndRender);
+        });
+
+        function loadAllWorkshops() {
+            const cacheBuster = new Date().getTime();
+            const url = `../api/get_workshops.php?t=${cacheBuster}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    renderWorkshops(document.getElementById('my-upcoming-workshops'), data.my_upcoming, 'upcoming');
+                    allAvailableWorkshops = data.available || []; 
+                    applyFiltersAndRender(); 
+                    renderWorkshops(document.getElementById('my-past-workshops'), data.my_past, 'past');
+                })
+                .catch(error => {
+                    console.error('Error fetching workshops:', error);
+                    document.getElementById('available-workshops').innerHTML = '<div class="col-12"><p class="text-center text-danger">حدث خطأ.</p></div>';
+                });
+        }
+        
+        function handleTabClick(e) {
+            const targetTabId = $(e.target).attr("id");
+            switch(targetTabId) {
+                case 'judicial-tab': activeMainCategory = 'دورات معهد الكويت للدراسات القضائية'; break;
+                case 'on-the-job-tab': activeMainCategory = 'التدريب اثناء العمل'; break;
+                case 'external-tab': activeMainCategory = 'البرامج التدريبية خارج الشئون الفنية'; break;
+                default: activeMainCategory = 'All';
+            }
+            
+            document.getElementById('subCategoryFilter').value = 'All';
+            document.getElementById('specializationFilter').value = 'All';
+
+            renderFilterDropdowns();
+            applyFiltersAndRender();
+        }
+
+        function handleSubCategoryChange() {
+            renderSpecializationFilter();
+            applyFiltersAndRender();
+        }
+        
+        function applyFiltersAndRender() {
+            const subCategoryFilter = document.getElementById('subCategoryFilter').value;
+            const specFilter = document.getElementById('specializationFilter').value;
+
+            const mainCategoryFiltered = (activeMainCategory === 'All')
+                ? allAvailableWorkshops
+                : allAvailableWorkshops.filter(w => (w.category_main || '').trim() === activeMainCategory);
+            
+            const subCategoryFiltered = (subCategoryFilter === 'All' || !subCategoryFilter)
+                ? mainCategoryFiltered
+                : mainCategoryFiltered.filter(w => (w.category_sub || '').trim() === subCategoryFilter);
+
+            const finalFilteredWorkshops = (specFilter === 'All' || !specFilter)
+                ? subCategoryFiltered
+                : subCategoryFiltered.filter(w => (w.category_specialization || '').trim() === specFilter);
+
+            renderWorkshops(document.getElementById('available-workshops'), finalFilteredWorkshops, 'available');
+        }
+
+        function renderFilterDropdowns() {
+            const filterContainer = document.getElementById('filter-bar-container');
+            const subCategorySelect = document.getElementById('subCategoryFilter');
+            
+            if (activeMainCategory === 'All' || !categories[activeMainCategory]) {
+                filterContainer.style.display = 'none';
+                return;
+            }
+
+            const subCategories = Object.keys(categories[activeMainCategory]);
+            subCategorySelect.innerHTML = '<option value="All">كل التصنيفات الفرعية</option>';
+            subCategories.forEach(sub => {
+                subCategorySelect.innerHTML += `<option value="${sub}">${sub}</option>`;
+            });
+            filterContainer.style.display = 'block';
+            renderSpecializationFilter();
+        }
+
+        function renderSpecializationFilter() {
+            const subCategory = document.getElementById('subCategoryFilter').value;
+            const specSelect = document.getElementById('specializationFilter');
+            const specContainer = specSelect.closest('.form-group');
+
+            if (subCategory === 'All' || !categories[activeMainCategory] || !categories[activeMainCategory][subCategory]) {
+                specContainer.style.display = 'none';
+                return;
+            }
+
+            const specializations = categories[activeMainCategory][subCategory];
+            if (specializations.length === 0 || specializations[0] === 'لا يوجد') {
+                specContainer.style.display = 'none';
+                return;
+            }
+
+            specSelect.innerHTML = '<option value="All">كل التخصصات</option>';
+            specializations.forEach(spec => {
+                specSelect.innerHTML += `<option value="${spec}">${spec}</option>`;
+            });
+            specContainer.style.display = 'block';
+        }
+
+
+        function renderWorkshops(container, workshops, type) {
+            container.innerHTML = '';
+            if (!workshops || workshops.length === 0) {
+                container.innerHTML = '<div class="col-12"><p class="text-muted text-center">لا توجد ورش لعرضها في هذا القسم حالياً.</p></div>';
+                return;
+            }
+            workshops.forEach((workshop) => {
+                const workshopDate = new Date(workshop.start_datetime).toLocaleString('ar-KW', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+                let actionButtonHtml = '', statusBadgeHtml = '';
+                if (type === 'available') {
+                    actionButtonHtml = `<button class="btn btn-success btn-block" onclick="registerForWorkshop(${workshop.workshop_id})">تقديم طلب تسجيل</button>`;
+                } else {
+                    actionButtonHtml = `<button class="btn btn-primary btn-block" onclick="showDetailsModal(this)" data-workshop='${JSON.stringify(workshop)}'>عرض التفاصيل</button>`;
+                }
+                if (type === 'upcoming') {
+                    statusBadgeHtml = workshop.registration_status === 'Approved' ? '<span class="badge badge-approved">مؤكد</span>' : '<span class="badge badge-pending">بانتظار الموافقة</span>';
+                }
+                const cardCol = document.createElement('div');
+                cardCol.className = 'col-lg-4 col-md-6';
+                cardCol.innerHTML = `
+                    <div class="workshop-card">
+                        <div class="card-body">
+                            <div class="card-header-flex"><h5 class="card-title">${workshop.title}</h5>${statusBadgeHtml}</div>
+                            <p class="card-description">${workshop.description || ''}</p>
+                            <p class="card-info"><i class="fa fa-user"></i> <strong>المحاضر:</strong> ${workshop.instructor_name || ''}</p>
+                            <p class="card-info"><i class="fa fa-calendar"></i> <strong>يبدأ في:</strong> ${workshopDate}</p>
+                            <p class="card-info"><i class="fa fa-map-marker"></i> <strong>الموقع:</strong> ${workshop.location || ''}</p>
+                            ${actionButtonHtml}
+                        </div>
+                    </div>`;
+                container.appendChild(cardCol);
+            });
+        }
+
+        function registerForWorkshop(workshopId) {
+            if (!confirm('هل أنت متأكد من رغبتك في التسجيل بهذه الورشة؟')) return;
+            fetch('../api/register_workshop.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ workshop_id: workshopId }) })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) {
+                    loadAllWorkshops();
+                }
+            })
+            .catch(error => console.error('Error registering:', error));
+        }
+        
+        function showDetailsModal(button) {
+            const workshop = JSON.parse(button.dataset.workshop);
+            $('#modalTitle').text(workshop.title);
+            $('#modalInstructor').text(`المحاضر: ${workshop.instructor_name}`);
+            $('#modalDescription').text(workshop.description);
+            const workshopDate = new Date(workshop.start_datetime).toLocaleString('ar-KW', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+            $('#modalDate').text(`التاريخ: ${workshopDate}`);
+            $('#modalLocation').text(`الموقع: ${workshop.location}`);
+            $('#workshopDetailsModal').modal('show');
+        }
+    </script>
+</body>
+</html>
+

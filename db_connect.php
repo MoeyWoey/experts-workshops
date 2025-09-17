@@ -3,10 +3,7 @@
 // Place this file in the same directory as your API scripts (e.g., htdocs).
 
 // --- IMPORTANT: Fill in your actual credentials from InfinityFree ---
-$servername = "sql304.infinityfree.com"; // Your host name
-$username = "if0_39848913";           // Your DB username
-$password = "Nano159159";    // Your DB password
-$dbname = "if0_39848913_experts_workshop";     // Your DB name
+
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

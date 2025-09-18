@@ -174,7 +174,12 @@ function renderWorkshopTable(tableBody, data, isActiveTable) {
             case 'Cancelled': statusBadge = `<span class="badge badge-danger">ملغاة</span>`; break;
             default: statusBadge = `<span class="badge badge-secondary">${status}</span>`;
         }
+        
         const row = document.createElement('tr');
+        // --- START OF CHANGE ---
+        row.className = 'clickable-row'; // Make row look clickable
+        // --- END OF CHANGE ---
+
         row.innerHTML = `
             <td>${workshop.title}</td>
             <td>${workshop.category_main || '-'}</td>
@@ -187,10 +192,23 @@ function renderWorkshopTable(tableBody, data, isActiveTable) {
                 <button class="btn-delete" title="حذف"><i class="fa fa-trash"></i></button>
             </td>
         `;
-        row.querySelector('.registrations-link').onclick = () => openRegistrationsModal(workshop.workshop_id, workshop.title);
-        row.querySelector('.btn-edit').onclick = () => openWorkshopModal(workshop);
-        row.querySelector('.btn-view').onclick = () => openRegistrationsModal(workshop.workshop_id, workshop.title);
-        row.querySelector('.btn-delete').onclick = () => deleteWorkshop(workshop.workshop_id);
+
+        // --- START OF CHANGE ---
+        // Add a single click listener to the row
+        row.addEventListener('click', function(event) {
+            // Do nothing if the click was on a button inside the action cell
+            if (event.target.closest('.action-buttons')) {
+                return;
+            }
+            openWorkshopDetailsModal(workshop);
+        });
+
+        // Use stopPropagation to prevent the row's click event from firing when a button is clicked
+        row.querySelector('.btn-edit').onclick = (e) => { e.stopPropagation(); openWorkshopModal(workshop); };
+        row.querySelector('.btn-view').onclick = (e) => { e.stopPropagation(); openRegistrationsModal(workshop.workshop_id, workshop.title); };
+        row.querySelector('.btn-delete').onclick = (e) => { e.stopPropagation(); deleteWorkshop(workshop.workshop_id); };
+        // --- END OF CHANGE ---
+
         tableBody.appendChild(row);
     });
 }
@@ -351,4 +369,39 @@ function updateRegistration(regId, newStatus, workshopId, workshopTitle) {
 
 function printAttendees(workshopId) {
     window.open(`print_attendees.html?workshop_id=${workshopId}`, '_blank');
+}
+
+function openWorkshopDetailsModal(workshop) {
+    const modalTitle = document.getElementById('detailsModalTitle');
+    const modalBody = document.getElementById('detailsModalBody');
+
+    modalTitle.innerText = workshop.title;
+
+    const detailsHtml = `
+        <dl class="row">
+            <dt class="col-sm-3">الوصف</dt>
+            <dd class="col-sm-9">${workshop.description || 'لا يوجد وصف'}</dd>
+
+            <dt class="col-sm-3">المحاضر</dt>
+            <dd class="col-sm-9">${workshop.instructor_name || 'غير محدد'}</dd>
+
+            <dt class="col-sm-3">تاريخ البدء</dt>
+            <dd class="col-sm-9">${new Date(workshop.start_datetime).toLocaleString('ar-KW')}</dd>
+
+            <dt class="col-sm-3">الموقع</dt>
+            <dd class="col-sm-9">${workshop.location || 'غير محدد'}</dd>
+
+            <dt class="col-sm-3">التصنيف</dt>
+            <dd class="col-sm-9">${workshop.category_main || '-'}${workshop.category_sub ? ' / ' + workshop.category_sub : ''}${workshop.category_specialization ? ' / ' + workshop.category_specialization : ''}</dd>
+
+            <dt class="col-sm-3">السعة</dt>
+            <dd class="col-sm-9">${workshop.approved_count} / ${workshop.max_capacity}</dd>
+
+            <dt class="col-sm-3">قيد الانتظار</dt>
+            <dd class="col-sm-9">${workshop.pending_count}</dd>
+        </dl>
+    `;
+
+    modalBody.innerHTML = detailsHtml;
+    $('#workshopDetailsModal').modal('show');
 }
